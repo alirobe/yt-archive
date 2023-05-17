@@ -1,27 +1,28 @@
 # yt-archive
 
-A lightweight Docker container for archiving YouTube channels using `yt-dlp`.
+A lightweight Docker container for archiving personal YouTube channels using `yt-dlp`.
 
-This repo is provided as-is, because it does what I want.
+This repo is provided as-is, because it does what I want. It contains minimal code, so it should be trustable. (The serve_file and generate_rss_feed functions can be removed if not needed)
 
-If you want to make customizations to this, fork it, adopt it, whatever, please go ahead. 
+If you want it to do what you want, go ahead and fork it, adopt it, whatever. I don't care, but I also can't guarantee I'll be around to give support or accept pull requests.
 
-I am not interested in providing support or accepting pull requests, unless you are requesting to adopt the project. 
+## Setting this up
 
-## Overview
-
-You need to map `/data/`, and create a file called `channels.txt` in the root of it. This file contains newline delimited youtube channel names.
-
-The container reads YouTube channel names and keep those channels mirrored locally in folders of the same name. 
+The container reads YouTube channel list and keep those channels mirrored locally in folders of the same name. 
 
 It runs whenever it recieves a GET request to the path `/go` on its exposed port. This can be used for scheduling or testing. 
 
-You can add this GET request to any task scheduler to ensure it happens regularly. yt-dlp does not re-download videos. For example powershell `curl "http://127.0.0.1:8205/go"` could be scheduled easily enough
+You can add this GET request to any task scheduler to ensure it happens regularly. yt-dlp does not re-download videos. For example bash/powershell `curl "http://127.0.0.1:8781/go"` could be scheduled easily enough, and you can also run this in the browser if you want a manual approach.
 
-## Prerequisites
+Please note that to avoid throttling this won't download more than 10 videos per channel per execution. You could just run it every day until the archive is filled, as already downloaded videos don't count towards the quota.
 
-- Docker
-- A text file with the names of the YouTube channels to download, one per line.
+The archive also provides an RSS feed of the folders it controls. 
+
+## Setup
+
+- You need Docker
+- A folder mapped to `/data/`
+- A text file with the names of the YouTube channels to download, formatted as per `channels.txt.sample`, in the root.
 
 ## Building the Docker image
 
@@ -36,20 +37,20 @@ docker build -t yt-archive .
 Run the Docker container with the following command:
 
 ```bash
-docker run -d -v c:/youtube/:/data/ -p 8205:8205 --name yt-archive yt-archive
+docker run -d -v c:/youtube/:/data/ -p 8781:8781 --name yt-archive yt-archive
 ```
 
-Replace `/path/on/host` with the path on your host machine where you will store the downloaded videos and where the `channels.txt` file is located. Replace `CRON_SCHEDULE` with your desired cron schedule in the format `minute hour day month day-of-week`.
+Replace `c:/youtube/` with the path on your host machine where you will store the downloaded videos; and where the `channels.txt` file is located.
 
 ## Saving the Docker image for import
 
-Save the Docker image with the following command:
+If you're running this on a NAS device, you'll want to save the Docker image with the following command:
 
 ```bash
 docker save yt-archive > yt-archive.tar
 ```
 
-You can then `docker import` this `.tar` file, or upload it to your docker GUI (e.g. synology docker) as an image.
+You can then copy the tar file to your target, and either run `docker import` on the `.tar` file, or upload it to your docker GUI as an image.
 
 ## Volumes
 
