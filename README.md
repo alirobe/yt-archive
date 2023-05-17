@@ -51,7 +51,7 @@ docker run -d -v c:/youtube/:/data/ -p 8781:8781 --name yt-archive yt-archive
 If you're running this on a NAS device, you'll want to save the Docker image with the following command:
 
 ```bash
-docker save yt-archive > yt-archive.tar
+docker save yt-archive -o yt-archive.tar
 ```
 
 You can then copy the tar file to your target, and either run `docker import` on the `.tar` file, or upload it to your docker GUI as an image.
